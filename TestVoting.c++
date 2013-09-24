@@ -33,6 +33,7 @@ gtest.h
 #include <iostream> // cout, endl
 #include <sstream> // istringtstream, ostringstream
 #include <string> // ==
+#include <vector>
 
 #include "gtest/gtest.h"
 
@@ -44,7 +45,8 @@ gtest.h
 
 // ----
 // read
-// ----
+// ----clear
+
 
     TEST(Voting, read) {
           std::istringstream r("3\nJohn Doe\nJane Smith\nSirhan Sirhan\n1 2 3\n2 1 3\n2 3 1\n1 2 3\n3 1 2");
@@ -53,11 +55,12 @@ gtest.h
         int ballots[6][20];
         char names[4][81];
         int tally[21];
+        std::vector< std::vector<int> > running_tally(21);
 
 
-        const bool b = voting_read(r, num_cand, num_ballots, ballots, names);
-        printf("%d\n", voting_eval(num_cand, num_ballots, ballots, tally));
-        
+        const bool b = voting_read(r, num_cand, num_ballots, ballots, names, running_tally);
+        printf("%d\n", voting_eval(num_cand, num_ballots, ballots, running_tally, tally));
+
         ASSERT_TRUE(b == true);
         ASSERT_TRUE(num_cand == 3);
         ASSERT_TRUE(num_ballots == 5);

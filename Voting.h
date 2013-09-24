@@ -12,6 +12,7 @@
 // --------
 
 #include <iostream> // istream, ostream
+#include <vector>
 
 // ------------
 // voting_read
@@ -24,7 +25,7 @@
 * @param j an int by reference
 * @return true if that succeeds, false otherwise
 */
-bool voting_read (std::istream&, int&, int& , int[][20], char[][81], std::vector< vector<int> >&);
+bool voting_read (std::istream&, int&, int& , int[][20], char[][81], std::vector< std::vector<int> >&);
 
 // ------------
 // voting_eval
@@ -34,14 +35,14 @@ bool voting_read (std::istream&, int&, int& , int[][20], char[][81], std::vector
 * @param i is the value whose cycle length this function computes
 * @return the cycle length of i
 */
-int voting_eval_help(unsigned long long);
+// int voting_eval_help(unsigned long long);
 
 /**
 * @param i the beginning of the range, inclusive
 * @param j the end of the range, inclusive
 * @return the max cycle length in the range [i, j]
 */
-int voting_eval (int, int, int[][20], int*);
+int voting_eval (int , int , int [][20], std::vector< std::vector<int> >& , int*);
 
 // -------------
 // voting_print

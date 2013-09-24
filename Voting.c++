@@ -22,7 +22,7 @@
 // voting_read
 // ------------
 
-bool voting_read (std::istream& r, int& num_cand, int& num_ballots , int ballots[][20], char names[][81], std::vector< vector<int> >& running_tally) {
+bool voting_read (std::istream& r, int& num_cand, int& num_ballots , int ballots[][20], char names[][81], std::vector< std::vector<int> >& running_tally) {
     r >> num_cand;
     if(DB) printf("Number of candidates %d\n", num_cand );
     assert(num_cand > 0);
@@ -49,7 +49,7 @@ bool voting_read (std::istream& r, int& num_cand, int& num_ballots , int ballots
     	//Eat the new line char from each row
     	r.get();
 
-    	running_tally[ballots[row][0]] = row;
+    	running_tally[ballots[row][0]].push_back(row);
     	++row;
 
     	// checks if you reached the EOF
@@ -62,17 +62,14 @@ bool voting_read (std::istream& r, int& num_cand, int& num_ballots , int ballots
     return true;}
 
 // ------------
-// voting_eval
+// voting_eval_help
 // ------------
 
-int voting_eval_help (unsigned long long i){
-	assert(i > 0);
-    int x = 1;
+// void voting_eval_help (int& num_cand, std::vector< vector<int> >& running_tally, std::vector<int>& losers, int tally[21])
+// {
 
-	
-		return x;
 	 
-}
+// }
 
 
 
@@ -96,20 +93,21 @@ int voting_eval_help (unsigned long long i){
     return x;
 }*/
 
-int voting_eval (int num_cand, int num_ballots, int ballots[][20], int tally[21]) 
+int voting_eval (int num_cand, int num_ballots, int ballots[][20], std::vector< std::vector<int> >& running_tally, int tally[21]) 
 {
-	int max_tally = 0;
-	int min_tally = 0;
 	std::vector<int> losers;
 
+	//counts first-place votes
+	for (int i = 1; i < running_tally.size(); ++i)
+	{
+		tally[i] = running_tally[i].size();
+	}
 
 	while(1)
 	{
-		//counts first-place votes
-		for (int i = 0; i < num_ballots; ++i)
-		{
-			++tally[ballots[i][0]];
-		}
+		int max_tally = 0;
+		int min_tally = 0;
+		int temp_min = 0;
 
 		//find max and min number of votes
 		for (int i = 0; i < num_cand; ++i)
@@ -119,7 +117,9 @@ int voting_eval (int num_cand, int num_ballots, int ballots[][20], int tally[21]
 			else
 			{
 				max_tally = std::max(tally[i], max_tally);
-				min_tally = std::min(tally[i], min_tally);
+				temp_min = std::min(tally[i], min_tally);
+				if (temp_min > 0)
+					min_tally = temp_min;
 			}
 		}
 
@@ -129,45 +129,46 @@ int voting_eval (int num_cand, int num_ballots, int ballots[][20], int tally[21]
 
 		//no clear winner, vote re-distribution
 		//first loop adds loser to a list
-		losers.erase();
+		losers.clear();
 		for (int i = 0; i < num_cand; ++i)
 		{
 			if(tally[i] == min_tally)
 				losers.push_back(i);
 		}
+
 		//second loop re-distributes vote
 		for (int i = 0; i < losers.size(); ++i)
 		{
-			for (int j = 0; j < num_ballots; ++j)
+			//loops through losers' ballots
+			for (int j = running_tally[i].size() - 1; j >= 0; --j)
 			{
-				if(ballots[j][0] == losers[i])
+				//loops through new candidates
+				for (int k = 1; k < num_cand; ++k)
 				{
-					for (int k = 1; k < num_cand; ++k)
+					bool found = true;
+					//check if new vote is in losers list
+					for (int l = 0; l < losers.size(); ++l)
 					{
-						bool found = true;
-
-						for (int l = 0; l < losers.size(); ++l)
+						if (ballots[ running_tally[ losers[i] ][j] ][k] == losers[l])
 						{
-							if (ballots[j][k] == losers[l])
-							{
-								found = false;
-								break;
-							}
-
+							found = false;
+							break;
 						}
-
-						if (found)
-						{
-							++tally[ballots[j][k]];
-						}
-
 					}
-
-
+					
+					if (found)
+					{
+						running_tally[ ballots[ running_tally[ losers[i] ][j] ][k] ].push_back( running_tally[ losers[i] ][j] );
+						running_tally[ losers[i] ].pop_back();
+						++tally[ ballots[ running_tally[ losers[i] ][j] ][k] ];
+						tally[ losers[i] ] = -1;
+					}					
 				}
-			}
 
+			}
 		}
+
+
     }
 
 }
@@ -198,11 +199,11 @@ void voting_solve (std::istream& r, std::ostream& w)
     int ballots[1000][20];
     char names[21][81];
     int tally[21];
-    vector< vector<int> > running_tally(21);
+    std::vector< std::vector<int> > running_tally(21);
 
     while ((num_test--) > 0) {
     	voting_read(r, num_cand, num_ballots, ballots, names, running_tally);   
-    	int winner = voting_eval(num_cand, num_ballots, ballots, tally);
+    	int winner = voting_eval(num_cand, num_ballots, ballots, running_tally, tally);
 
     	printf("%d\n", winner );
     }
