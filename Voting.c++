@@ -1,7 +1,8 @@
 // ----------------------------
-// projects/collatz/Collatz.c++
+// projects/voting/Voting.c++
 // Copyright (C) 2013
-// Glenn P. Downing
+// Kevin Tran
+// Pratik Patel
 // ----------------------------
 
 // --------
@@ -10,68 +11,72 @@
 
 #include <cassert> // assert
 #include <iostream> // endl, istream, ostream
+#include <vector>
+#include <algorithm>
 
-#include "Collatz.h"
+#include "Voting.h"
+
+#define DB 0
 
 // ------------
-// collatz_read
+// voting_read
 // ------------
 
-bool collatz_read (std::istream& r, int& i, int& j) {
-    r >> i;
-    if (!r)
-        return false;
-    r >> j;
-    assert(i > 0);
-    assert(j > 0);
+bool voting_read (std::istream& r, int& num_cand, int& num_ballots , int ballots[][20], char names[][81], std::vector< vector<int> >& running_tally) {
+    r >> num_cand;
+    if(DB) printf("Number of candidates %d\n", num_cand );
+    assert(num_cand > 0);
+    // eats the new line after the num_cand
+    r.get();
+    for (int i = 1; i <= num_cand; ++i)
+    {
+    	r.getline(names[i], 80);
+    	if(DB) printf("%s\n", names[i] );
+    }
+
+    int row = 0;
+    int col;
+ 
+    while((r.peek() != '\n') )
+    {
+    	for (col = 0; col < num_cand; ++col)
+    	{
+    		r >> ballots[row][col];
+    		if(DB) printf("%d ", ballots[row][col] );
+    	}
+    	if(DB) printf("\n");
+
+    	//Eat the new line char from each row
+    	r.get();
+
+    	running_tally[ballots[row][0]] = row;
+    	++row;
+
+    	// checks if you reached the EOF
+    	if(!r)
+    		break;
+    	
+
+    }
+    	num_ballots = row;
     return true;}
 
 // ------------
-// collatz_eval
+// voting_eval
 // ------------
 
-const unsigned int sizearr = 100001;
- int cache[sizearr] ;
-
-int collatz_eval_help (unsigned long long i){
+int voting_eval_help (unsigned long long i){
 	assert(i > 0);
     int x = 1;
 
-	if( i == 1)
-	return 1;
-
-	if((i < sizearr) && (cache[i]))
-		return cache[i];
-	 else{  
-		if ((i % 2) == 0)
-		{
-			if(i < sizearr)
-			{
-			cache[i] = 1 + collatz_eval_help(i >> 1);
-			x = cache[i];
-			}
-			else
-				x = 1 + collatz_eval_help(i >> 1);
 	
-		}
-		else
-		{
-			 if(i <sizearr){
-				 cache[i] = 2 + collatz_eval_help( (3 * i + 1) >> 1);
-				 x = cache[i];
-			 }
-			 else
-				 x = 2 + collatz_eval_help((3 * i + 1) >> 1);
-		}
-     
-		assert(x > 0);
 		return x;
-	 }
+	 
 }
 
 
 
-/*int collatz_eval_help (int i){
+/*int voting_eval_help (int i){
 	assert(i > 0);
 	unsigned long long ans = (unsigned long long) i;
     int x = 1;
@@ -91,61 +96,116 @@ int collatz_eval_help (unsigned long long i){
     return x;
 }*/
 
-int collatz_eval (int i, int j) {
-    assert(i > 0);
-    assert(j > 0);
-	int m;
-	int n;
-	int temp;
-	
-	if(i > j){
-	m = j;
-	n = i;
-	}
-	else{
-	m = i;
-	n = j;
+int voting_eval (int num_cand, int num_ballots, int ballots[][20], int tally[21]) 
+{
+	int max_tally = 0;
+	int min_tally = 0;
+	std::vector<int> losers;
+
+
+	while(1)
+	{
+		//counts first-place votes
+		for (int i = 0; i < num_ballots; ++i)
+		{
+			++tally[ballots[i][0]];
 		}
-	assert(n >= m);	
-	
-	int ans = 1;
-        int half = n / 2;
-	if(half > m){
-	temp = half;}
-	else
-	 temp = m;
-	int max = 1;
-	while(temp <= n){
-		ans = collatz_eval_help((unsigned long long) temp);
-		if(ans > max)
-			max = ans;
-		++temp;
-	}
-    // <your code>
-   // int v = 1;
-    assert(max > 0);
-    return max;}
+
+		//find max and min number of votes
+		for (int i = 0; i < num_cand; ++i)
+		{
+			if(tally[i] > num_ballots / 2)
+				return tally[i];
+			else
+			{
+				max_tally = std::max(tally[i], max_tally);
+				min_tally = std::min(tally[i], min_tally);
+			}
+		}
+
+		//check if all tie
+		if (max_tally == min_tally)
+			return max_tally;
+
+		//no clear winner, vote re-distribution
+		//first loop adds loser to a list
+		losers.erase();
+		for (int i = 0; i < num_cand; ++i)
+		{
+			if(tally[i] == min_tally)
+				losers.push_back(i);
+		}
+		//second loop re-distributes vote
+		for (int i = 0; i < losers.size(); ++i)
+		{
+			for (int j = 0; j < num_ballots; ++j)
+			{
+				if(ballots[j][0] == losers[i])
+				{
+					for (int k = 1; k < num_cand; ++k)
+					{
+						bool found = true;
+
+						for (int l = 0; l < losers.size(); ++l)
+						{
+							if (ballots[j][k] == losers[l])
+							{
+								found = false;
+								break;
+							}
+
+						}
+
+						if (found)
+						{
+							++tally[ballots[j][k]];
+						}
+
+					}
+
+
+				}
+			}
+
+		}
+    }
+
+}
 
 
 // -------------
-// collatz_print
+// voting_print
 // -------------
 
-void collatz_print (std::ostream& w, int i, int j, int v) {
+void voting_print (std::ostream& w, int i, int j, int v) 
+{
     assert(i > 0);
     assert(j > 0);
     assert(v > 0);
-    w << i << " " << j << " " << v << std::endl;}
+    w << i << " " << j << " " << v << std::endl;
+}
 
 // -------------
-// collatz_solve
+// voting_solve
 // -------------
 
-void collatz_solve (std::istream& r, std::ostream& w) {
-    int i;
-    int j;
-    while (collatz_read(r, i, j)) {
-        const int v = collatz_eval(i, j);
-        collatz_print(w, i, j, v);}
-	}
+void voting_solve (std::istream& r, std::ostream& w) 
+{
+    int num_test;
+    r >> num_test;
+    int num_cand;
+    int num_ballots;
+    int ballots[1000][20];
+    char names[21][81];
+    int tally[21];
+    vector< vector<int> > running_tally(21);
+
+    while ((num_test--) > 0) {
+    	voting_read(r, num_cand, num_ballots, ballots, names, running_tally);   
+    	int winner = voting_eval(num_cand, num_ballots, ballots, tally);
+
+    	printf("%d\n", winner );
+    }
+	
+}
 

@@ -1,11 +1,11 @@
 // --------------------------
-// projects/collatz/Collatz.h
+// projects/voting/voting.h
 // Copyright (C) 2013
 // Glenn P. Downing
 // --------------------------
 
-#ifndef Collatz_h
-#define Collatz_h
+#ifndef Voting_h
+#define Voting_h
 
 // --------
 // includes
@@ -14,7 +14,7 @@
 #include <iostream> // istream, ostream
 
 // ------------
-// collatz_read
+// voting_read
 // ------------
 
 /**
@@ -24,27 +24,27 @@
 * @param j an int by reference
 * @return true if that succeeds, false otherwise
 */
-bool collatz_read (std::istream&, int&, int&);
+bool voting_read (std::istream&, int&, int& , int[][20], char[][81], std::vector< vector<int> >&);
 
 // ------------
-// collatz_eval
+// voting_eval
 // ------------
 
 /*
 * @param i is the value whose cycle length this function computes
 * @return the cycle length of i
 */
-int collatz_eval_help(unsigned long long);
+int voting_eval_help(unsigned long long);
 
 /**
 * @param i the beginning of the range, inclusive
 * @param j the end of the range, inclusive
 * @return the max cycle length in the range [i, j]
 */
-int collatz_eval (int, int);
+int voting_eval (int, int, int[][20], int*);
 
 // -------------
-// collatz_print
+// voting_print
 // -------------
 
 /**
@@ -54,10 +54,10 @@ int collatz_eval (int, int);
 * @param j the end of the range, inclusive
 * @param v the max cycle length
 */
-void collatz_print (std::ostream&, int, int, int);
+void voting_print (std::ostream&, int, int, int);
 
 // -------------
-// collatz_solve
+// voting_solve
 // -------------
 
 /**
@@ -65,6 +65,6 @@ void collatz_print (std::ostream&, int, int, int);
 * @param r a std::istream
 * @param w a std::ostream
 */
-void collatz_solve (std::istream&, std::ostream&);
+void voting_solve (std::istream&, std::ostream&);
 
-#endif // Collatz_h
+#endif // Voting_h
