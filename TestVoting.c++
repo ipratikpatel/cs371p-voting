@@ -50,8 +50,42 @@ gtest.h
 // ----clear
 
 
-    TEST(Voting, read) {
+    TEST(Voting, read1) {
           std::istringstream r("3\nJohn Doe\nJane Smith\nSirhan Sirhan\n1 2 3\n2 1 3\n2 3 1\n1 2 3\n3 1 2");
+        int num_cand;
+        int num_ballots;
+        int ballots[6][20];
+        char names[4][81];
+        int tally[21];
+        std::vector< std::vector<int> > running_tally(21);
+
+
+        const bool b = voting_read(r, num_cand, num_ballots, ballots, names, running_tally);
+        int winning_tally = voting_eval(num_cand, num_ballots, ballots, running_tally, tally);
+
+        std::cout << std::endl;
+        std::cout << std::endl;
+
+        for (int i = 1; i <= num_cand; ++i)
+        {
+            if (tally[i] == winning_tally)
+                std::cout << "Winning candidate = " << names[i] << std::endl; 
+        }
+
+        std::cout << std::endl;
+        std::cout << std::endl;
+
+        ASSERT_TRUE(b == true);
+        ASSERT_TRUE(num_cand == 3);
+        ASSERT_TRUE(num_ballots == 5);
+        ASSERT_TRUE(strcmp(names[1], "John Doe") == 0);
+        ASSERT_TRUE(strcmp(names[2], "Jane Smith") == 0);
+        ASSERT_TRUE(strcmp(names[3], "Sirhan Sirhan") == 0);
+
+    }
+
+    TEST(Voting, read2) {
+          std::istringstream r("4\nRed\nGreen\nBlue\nOrange\n1 2 3 4\n2 1 3 4\n2 3 1 4\n1 2 3 4\n3 4 1 2\n4 3 2 1");
         int num_cand;
         int num_ballots;
         int ballots[6][20];
