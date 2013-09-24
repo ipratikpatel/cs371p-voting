@@ -1,8 +1,10 @@
-// --------------------------
-// projects/voting/voting.h
+// ----------------------------
+// /cs371p-voting/Voting.h
 // Copyright (C) 2013
-// Glenn P. Downing
-// --------------------------
+// CS371p Fall 2013
+// Kevin Tran
+// Pratik Patel
+// ----------------------------
 
 #ifndef Voting_h
 #define Voting_h

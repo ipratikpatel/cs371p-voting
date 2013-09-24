@@ -1,8 +1,10 @@
-// --------------------------------
-// projects/Voting/TestVoting.c++
+// ----------------------------
+// /cs371p-voting/TestVoting.c++
 // Copyright (C) 2013
-// Glenn P. Downing
-// --------------------------------
+// CS371p Fall 2013
+// Kevin Tran
+// Pratik Patel
+// ----------------------------
 
 /*
 To test the program:
@@ -69,7 +71,7 @@ gtest.h
             if (tally[i] == winning_tally)
                 std::cout << "Winning candidate = " << names[i] << std::endl; 
         }
-        
+
         std::cout << std::endl;
         std::cout << std::endl;
 

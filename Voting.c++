@@ -1,6 +1,7 @@
 // ----------------------------
-// projects/voting/Voting.c++
+// /cs371p-voting/Voting.c++
 // Copyright (C) 2013
+// CS371p Fall 2013
 // Kevin Tran
 // Pratik Patel
 // ----------------------------
