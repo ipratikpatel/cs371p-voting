@@ -97,21 +97,39 @@ int voting_eval (int num_cand, int num_ballots, int ballots[][20], std::vector< 
 {
 	std::vector<int> losers;
 
+
+	std::cout << "running_tally at 0 " << running_tally[0].size() << std::endl;
+	std::cout << "running_tally at 1 " << running_tally[1].size() << std::endl;
+	std::cout << "running_tally at 2 " << running_tally[2].size() << std::endl;
+	std::cout << "running_tally at 3 " << running_tally[3].size() << std::endl;
+	std::cout << "running_tally at 4 " << running_tally[4].size() << std::endl;
+
+
 	//counts first-place votes
-	for (int i = 1; i < running_tally.size(); ++i)
+	for (int i = 1; i <= num_cand; ++i)
 	{
 		tally[i] = running_tally[i].size();
+
+		std::cout << "tally #s: " << tally[i] << std::endl;
 	}
+
+	// std::cout << "in voting eval" << std::endl;
 
 	while(1)
 	{
-		int max_tally = 0;
-		int min_tally = 0;
+		std::cout << std::endl;
+		std::cout << std::endl;
+		std::cout << std::endl;
+		std::cout << std::endl;
+
+		int max_tally = tally[1];
+		int min_tally = tally[1];
 		int temp_min = 0;
 
 		//find max and min number of votes
-		for (int i = 0; i < num_cand; ++i)
+		for (int i = 1; i <= num_cand; ++i)
 		{
+			std::cout << "tally at " << i << " is " << tally[i] << std::endl;
 			if(tally[i] > num_ballots / 2)
 				return tally[i];
 			else
@@ -120,8 +138,13 @@ int voting_eval (int num_cand, int num_ballots, int ballots[][20], std::vector< 
 				temp_min = std::min(tally[i], min_tally);
 				if (temp_min > 0)
 					min_tally = temp_min;
+
+				std::cout << "temp_min: " << temp_min << " min_tally: " << min_tally << std::endl;
+
 			}
 		}
+
+		std::cout << "max_tally: " << max_tally << " min_tally " << min_tally << std::endl;
 
 		//check if all tie
 		if (max_tally == min_tally)
@@ -130,38 +153,50 @@ int voting_eval (int num_cand, int num_ballots, int ballots[][20], std::vector< 
 		//no clear winner, vote re-distribution
 		//first loop adds loser to a list
 		losers.clear();
-		for (int i = 0; i < num_cand; ++i)
+		for (int i = 0; i <= num_cand; ++i)
 		{
 			if(tally[i] == min_tally)
+			{
 				losers.push_back(i);
+				std::cout << "losers # " << i << std::endl;
+			}
 		}
 
 		//second loop re-distributes vote
-		for (int i = 0; i < losers.size(); ++i)
+		for (unsigned int i = 0; i < losers.size(); ++i)
 		{
+			std::cout << "currently in loser #: " << losers[i] << std::endl;
+			std::cout << "loser's vector size: " << running_tally[ losers[i] ].size() << std::endl;
 			//loops through losers' ballots
-			for (int j = running_tally[i].size() - 1; j >= 0; --j)
+			for (int j = running_tally[ losers[i] ].size() - 1; j >= 0; --j)
 			{
+				std::cout << "loser #: " << losers[i] << " at ballot pos: " << running_tally[ losers[i] ][j] << std::endl;
 				//loops through new candidates
-				for (int k = 1; k < num_cand; ++k)
+				for (int k = 1; k <= num_cand; ++k)
 				{
+					std::cout << "currently looking at candidate # " << k << " in ballot" << std::endl;
 					bool found = true;
 					//check if new vote is in losers list
-					for (int l = 0; l < losers.size(); ++l)
+					for (unsigned int l = 0; l < losers.size(); ++l)
 					{
+						std::cout << "new winner in ballot is " << ballots[ running_tally[ losers[i] ][j] ][k] << " and loser list have cand: " << losers[l] << std::endl;
 						if (ballots[ running_tally[ losers[i] ][j] ][k] == losers[l])
 						{
 							found = false;
 							break;
 						}
 					}
-					
 					if (found)
 					{
+						std::cout << "Loser cand #: " << losers[i] << std::endl;
+						std::cout << "New cand winner #: " << ballots[ running_tally[ losers[i] ][j] ][k] << " ballot #: " << running_tally[ losers[i] ][j] << std::endl;
 						running_tally[ ballots[ running_tally[ losers[i] ][j] ][k] ].push_back( running_tally[ losers[i] ][j] );
 						running_tally[ losers[i] ].pop_back();
+						std::cout << " tally at pos " << ballots[ running_tally[ losers[i] ][j] ][k] << " before is " << tally[ ballots[ running_tally[ losers[i] ][j] ][k] ] << std::endl;
 						++tally[ ballots[ running_tally[ losers[i] ][j] ][k] ];
+						std::cout << "just incremented tally at pos " << ballots[ running_tally[ losers[i] ][j] ][k] << std::endl;
 						tally[ losers[i] ] = -1;
+						break;
 					}					
 				}
 

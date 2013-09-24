@@ -59,7 +59,19 @@ gtest.h
 
 
         const bool b = voting_read(r, num_cand, num_ballots, ballots, names, running_tally);
-        printf("%d\n", voting_eval(num_cand, num_ballots, ballots, running_tally, tally));
+        int winning_tally = voting_eval(num_cand, num_ballots, ballots, running_tally, tally);
+
+        std::cout << std::endl;
+        std::cout << std::endl;
+
+        for (int i = 1; i <= num_cand; ++i)
+        {
+            if (tally[i] == winning_tally)
+                std::cout << "Winning candidate = " << names[i] << std::endl; 
+        }
+        
+        std::cout << std::endl;
+        std::cout << std::endl;
 
         ASSERT_TRUE(b == true);
         ASSERT_TRUE(num_cand == 3);
