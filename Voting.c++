@@ -14,6 +14,7 @@
 #include <iostream> // endl, istream, ostream
 #include <vector>
 #include <algorithm>
+#include <string.h>
 
 #include "Voting.h"
 
@@ -24,37 +25,57 @@
 // voting_read
 // ------------
 
-void voting_read (std::istream& r, int& num_cand, int& num_ballots , int ballots[][20], char names[][81], std::vector< std::vector<int> >& running_tally) {
-    r >> num_cand;
-    if(DB2) std::cout << "Number of candidates " << num_cand << std::endl;
-    assert(num_cand > 0);
-    // eats the new line after the num_cand
-    r.get();
-    for (int i = 1; i <= num_cand; ++i)
-    {
-    	r.getline(names[i], 80);
-    	if(DB2) std::cout << names[i] << std::endl;
-    }
-
-    int row = 0;
+void voting_read (std::istream& r, int& num_cand, int& num_ballots , int ballots[][20], char names[][256], std::vector< std::vector<int> >& running_tally) {
+	int row = 0;
     int col;
  	char line[256];
  	char check;
  	bool good_state = true;
+
+    r >> num_cand;
+    if(DB2) std::cout << "Number of candidates " << num_cand << std::endl;
+
+    // eats the new line after the num_cand
+    r.getline(line, 256);
+
+    for (int i = 1; i <= num_cand; ++i)
+    {
+    	r.getline(names[i], 256);
+    	if(DB2) std::cout << names[i] << std::endl;
+    }
+
+
     while(good_state)
     {
-    	for (col = 0; col < num_cand; ++col)
-    	{
-    		r >> ballots[row][col];
-    		if(DB2) std::cout << ballots[row][col] << std::endl;
-    	}
-    	if(DB2) std::cout << std::endl;
+    	// for (col = 0; col < num_cand; ++col)
+    	// {
+    	// 	r >> ballots[row][col];
+    	// 	assert (ballots[row][col] > 0 && ballots[row][col] <= 20);
 
-    	//Eat the rest of the line
+    	// 	if(DB2) std::cout << ballots[row][col] << std::endl;
+    	// }
+    	// if(DB2) std::cout << std::endl;
+
+    	// //Eat the rest of the line
+    	// r.getline(line, 256);
+
     	r.getline(line, 256);
+
+		char *tok, *saved;
+		col = 0;
+		for (tok = strtok_r(line, " ", &saved); tok; tok = strtok_r(NULL, " ", &saved))
+		{
+			assert (col < num_cand);
+		    ballots[row][col] = atoi(tok);
+		    if(DB2) std::cout << ballots[row][col] << " ";
+		    ++col;
+		}
+
+		if(DB2) std::cout << std::endl;
 
     	running_tally[ballots[row][0]].push_back(row);
     	++row;
+    	assert(row <= 1000);
 
     	//checks if reached EOF or a blank line
     	r.get(check);
@@ -63,14 +84,16 @@ void voting_read (std::istream& r, int& num_cand, int& num_ballots , int ballots
     	else
     		r.unget();						// valid input, putting back in istream
     	
-
     }
-    	num_ballots = row;
+
+	num_ballots = row;
+    assert(num_cand > 0);
 }
 
 
 int voting_eval (int num_cand, int num_ballots, int ballots[][20], std::vector< std::vector<int> >& running_tally, int tally[21]) 
 {
+	if(DB) std::cout << "entering eval" << std::endl;
 	std::vector<int> losers;
 
 	//counts first-place votes
@@ -86,28 +109,23 @@ int voting_eval (int num_cand, int num_ballots, int ballots[][20], std::vector< 
 		min_tally = max_tally;
 		max_tally = 0;		
 		
+		if(DB) std::cout << std::endl;
 
 		//find max and min number of votes
 		for (int i = 1; i <= num_cand; ++i)
 		{
-			if(DB) std::cout << "i: " << i << "num_cand: " << num_cand << std::endl;
 			if(DB) std::cout << "tally at " << i << " is " << tally[i] << std::endl;
 			if(tally[i] > num_ballots / 2)
 				return tally[i];
 			else
 			{
 				max_tally = std::max(tally[i], max_tally);
-				if (tally[i] >= 0)
-				{
+				if (tally[i] > 0)
 					min_tally = std::min(tally[i], min_tally);
-					
-				}
-				
-
 			}
 		}
 
-	    if(DB) std::cout << "After num_cand: " << num_cand << std::endl;
+	    if(DB) std::cout << std::endl;
 
 		//check if all tie
 		if (max_tally == min_tally)
@@ -116,13 +134,14 @@ int voting_eval (int num_cand, int num_ballots, int ballots[][20], std::vector< 
 		//no clear winner, vote re-distribution
 		//first loop adds loser to a list
 		losers.clear();
-		for (int i = 0; i <= num_cand; ++i)
+		for (int i = 1; i <= num_cand; ++i)
 		{
-		   	if(DB)  std::cout << "here num_cand: " << min_tally << std::endl;
+		   	if(DB)  std::cout << "min_tally #: " << min_tally << std::endl;
 
 			if(tally[i] == min_tally)
 			{
 				losers.push_back(i);
+				tally[i] = -1;
 				if(DB) std::cout << "losers # " << i << std::endl;
 			}
 		}
@@ -137,7 +156,7 @@ int voting_eval (int num_cand, int num_ballots, int ballots[][20], std::vector< 
 			{
 				if(DB) std::cout << "loser #: " << losers[i] << " at ballot pos: " << running_tally[ losers[i] ][j] << std::endl;
 				//loops through new candidates to check if new candidate is also a looser
-				for (int k = 1; k <= num_cand; ++k)
+				for (int k = 1; k < num_cand; ++k)
 				{
 					if(DB) std::cout << "currently looking at candidate # " << k << " in ballot" << std::endl;
 					bool found = true;
@@ -158,7 +177,6 @@ int voting_eval (int num_cand, int num_ballots, int ballots[][20], std::vector< 
 						running_tally[ ballots[ running_tally[ losers[i] ][j] ][k] ].push_back( running_tally[ losers[i] ][j] );
 						running_tally[ losers[i] ].pop_back();
 						++tally[ ballots[ running_tally[ losers[i] ][j] ][k] ];
-						tally[ losers[i] ] = -1;
 						break;
 					}					
 				}
@@ -176,7 +194,7 @@ int voting_eval (int num_cand, int num_ballots, int ballots[][20], std::vector< 
 // voting_print
 // -------------
 
-void voting_print (std::ostream& w, int& num_cand, char names[][81] , int* tally, int& winning_tally) 
+void voting_print (std::ostream& w, int& num_cand, char names[][256] , int* tally, int& winning_tally) 
 {
 	bool isFirst = true;
     for (int i = 1; i <= num_cand; ++i)
@@ -205,7 +223,7 @@ void voting_solve (std::istream& r, std::ostream& w)
     int num_cand;
     int num_ballots;
     int ballots[1000][20];
-    char names[21][81];
+    char names[21][256];
     int tally[21];
     std::vector< std::vector<int> > running_tally(21);
 
@@ -227,6 +245,6 @@ void voting_solve (std::istream& r, std::ostream& w)
 
     	isFirstCase = false;
     }
-	
+
 }
 

@@ -27,7 +27,7 @@
 * @param j an int by reference
 * @return true if that succeeds, false otherwise
 */
-void voting_read (std::istream&, int&, int& , int[][20], char[][81], std::vector< std::vector<int> >&);
+void voting_read (std::istream&, int&, int& , int[][20], char[][256], std::vector< std::vector<int> >&);
 
 // ------------
 // voting_eval
