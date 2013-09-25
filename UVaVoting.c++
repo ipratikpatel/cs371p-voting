@@ -17,13 +17,13 @@
 
 
 #define DB 0
-#define DB2 0
+#define DB2 1
 
 // ------------
 // voting_read
 // ------------
 
-bool voting_read (std::istream& r, int& num_cand, int& num_ballots , int ballots[][20], char names[][81], std::vector< std::vector<int> >& running_tally) {
+void voting_read (std::istream& r, int& num_cand, int& num_ballots , int ballots[][20], char names[][81], std::vector< std::vector<int> >& running_tally) {
     r >> num_cand;
     if(DB2) std::cout << "Number of candidates " << num_cand << std::endl;
     assert(num_cand > 0);
@@ -37,8 +37,11 @@ bool voting_read (std::istream& r, int& num_cand, int& num_ballots , int ballots
 
     int row = 0;
     int col;
- 
-    while((r.peek() != '\n') )
+ 	char line[256];
+ 	char check;
+ 	bool good_state = true;
+ 	int counter = 0;
+    while(good_state)
     {
     	for (col = 0; col < num_cand; ++col)
     	{
@@ -47,20 +50,24 @@ bool voting_read (std::istream& r, int& num_cand, int& num_ballots , int ballots
     	}
     	if(DB2) std::cout << std::endl;
 
-    	//Eat the new line char from each row
-    	r.get();
+    	//Eat the rest of the line
+    	r.getline(line, 256);
 
     	running_tally[ballots[row][0]].push_back(row);
     	++row;
 
-    	// checks if you reached the EOF
-    	if(!r)
+    	//checks if reached EOF or a blank line
+    	r.get(check);
+    	if(r.eof() || check == '\n')
     		break;
+    	else
+    		r.unget();						// valid input, putting back in istream
     	
-
+    	++counter;
+    	if (counter == 100)
+    		break;
     }
     	num_ballots = row;
-    return true;
 }
 
 
@@ -74,10 +81,13 @@ int voting_eval (int num_cand, int num_ballots, int ballots[][20], std::vector< 
 
 	int min_tally = num_ballots;
 	int max_tally = 0;
-	
+	int counter = 0;
     // Loop through until winner is found
 	while(1)
 	{
+		++counter;
+		if (counter == 2)
+			break;
 		min_tally = max_tally;
 		max_tally = 0;		
 		
@@ -208,7 +218,7 @@ void voting_solve (std::istream& r, std::ostream& w)
     while ((num_test--) > 0) {
     	if (!isFirstCase)
     	{
-    		r.get();
+    		// r.get();
     		//clear vector
     		std::vector< std::vector<int> > new_tally(21);
     		running_tally.swap(new_tally);

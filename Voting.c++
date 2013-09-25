@@ -24,7 +24,7 @@
 // voting_read
 // ------------
 
-bool voting_read (std::istream& r, int& num_cand, int& num_ballots , int ballots[][20], char names[][81], std::vector< std::vector<int> >& running_tally) {
+void voting_read (std::istream& r, int& num_cand, int& num_ballots , int ballots[][20], char names[][81], std::vector< std::vector<int> >& running_tally) {
     r >> num_cand;
     if(DB2) std::cout << "Number of candidates " << num_cand << std::endl;
     assert(num_cand > 0);
@@ -38,8 +38,10 @@ bool voting_read (std::istream& r, int& num_cand, int& num_ballots , int ballots
 
     int row = 0;
     int col;
- 
-    while((r.peek() != '\n') )
+ 	char line[256];
+ 	char check;
+ 	bool good_state = true;
+    while(good_state)
     {
     	for (col = 0; col < num_cand; ++col)
     	{
@@ -48,21 +50,22 @@ bool voting_read (std::istream& r, int& num_cand, int& num_ballots , int ballots
     	}
     	if(DB2) std::cout << std::endl;
 
-    	//Eat the new line char from each row
-    	r.get();
-    	r.get(); //remember to delete
+    	//Eat the rest of the line
+    	r.getline(line, 256);
 
     	running_tally[ballots[row][0]].push_back(row);
     	++row;
 
-    	// checks if you reached the EOF
-    	if(!r)
+    	//checks if reached EOF or a blank line
+    	r.get(check);
+    	if(r.eof() || check == '\n')
     		break;
+    	else
+    		r.unget();						// valid input, putting back in istream
     	
 
     }
     	num_ballots = row;
-    return true;
 }
 
 
@@ -210,7 +213,7 @@ void voting_solve (std::istream& r, std::ostream& w)
     while ((num_test--) > 0) {
     	if (!isFirstCase)
     	{
-    		r.get();
+    		// r.get();
     		//clear vector
     		std::vector< std::vector<int> > new_tally(21);
     		running_tally.swap(new_tally);
