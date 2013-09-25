@@ -1,0 +1,46 @@
+Running main() from gtest_main.cc
+[==========] Running 1 test from 1 test case.
+[----------] Global test environment set-up.
+[----------] 1 test from Voting
+[ RUN      ] Voting.read
+running_tally at 0 0
+running_tally at 1 2
+running_tally at 2 2
+running_tally at 3 1
+running_tally at 4 0
+tally #s: 2
+tally #s: 2
+tally #s: 1
+
+
+
+
+tally at 1 is 2
+temp_min: 2 min_tally: 2
+tally at 2 is 2
+temp_min: 2 min_tally: 2
+tally at 3 is 1
+temp_min: 1 min_tally: 1
+max_tally: 2 min_tally 1
+losers # 3
+currently in loser #: 3
+loser's vector size: 1
+loser #: 3 at ballot pos: 4
+currently looking at candidate # 1 in ballot
+new winner in ballot is 1 and loser list have cand: 3
+Loser cand #: 3
+New cand winner #: 1 ballot #: 4
+ tally at pos 1 before is 2
+just incremented tally at pos 1
+
+
+
+
+tally at 1 is 3
+Winning candidate = John Doe
+[       OK ] Voting.read (1 ms)
+[----------] 1 test from Voting (1 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test case ran. (1 ms total)
+[  PASSED  ] 1 test.

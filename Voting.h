@@ -57,7 +57,7 @@ int voting_eval (int , int , int [][20], std::vector< std::vector<int> >& , int*
 * @param j the end of the range, inclusive
 * @param v the max cycle length
 */
-void voting_print (std::ostream&, int, int, int);
+void voting_print (std::ostream& , int& , char [][81] , int* , int& );
 
 // -------------
 // voting_solve
