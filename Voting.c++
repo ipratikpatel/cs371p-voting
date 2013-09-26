@@ -25,47 +25,38 @@
 // voting_read
 // ------------
 
-void voting_read (std::istream& r, int& num_cand, int& num_ballots , int ballots[][20], char names[][256], std::vector< std::vector<int> >& running_tally) {
+void voting_read (std::istream& r, int& num_cand, int& num_ballots , int ballots[][20], char names[][81], std::vector< std::vector<int> >& running_tally) {
 	int row = 0;
     int col;
  	char line[256];
  	char check;
  	bool good_state = true;
+ 	char *tok, *saved;
 
+ 	//gets candidate number
     r >> num_cand;
     if(DB2) std::cout << "Number of candidates " << num_cand << std::endl;
 
     // eats the new line after the num_cand
     r.getline(line, 256);
 
+    //read all the candidate names
     for (int i = 1; i <= num_cand; ++i)
     {
-    	r.getline(names[i], 256);
+    	r.getline(names[i], 81);
     	if(DB2) std::cout << names[i] << std::endl;
     }
 
 
+    //read all the ballots
     while(good_state)
     {
-    	// for (col = 0; col < num_cand; ++col)
-    	// {
-    	// 	r >> ballots[row][col];
-    	// 	assert (ballots[row][col] > 0 && ballots[row][col] <= 20);
-
-    	// 	if(DB2) std::cout << ballots[row][col] << std::endl;
-    	// }
-    	// if(DB2) std::cout << std::endl;
-
-    	// //Eat the rest of the line
-    	// r.getline(line, 256);
-
     	r.getline(line, 256);
 
-		char *tok, *saved;
+    	//reads each ballot line and save to correct array
 		col = 0;
-		for (tok = strtok_r(line, " ", &saved); tok; tok = strtok_r(NULL, " ", &saved))
+		for (tok = strtok_r(line, " ", &saved); tok ; tok = strtok_r(NULL, " ", &saved))
 		{
-			assert (col < num_cand);
 		    ballots[row][col] = atoi(tok);
 		    if(DB2) std::cout << ballots[row][col] << " ";
 		    ++col;
@@ -73,6 +64,7 @@ void voting_read (std::istream& r, int& num_cand, int& num_ballots , int ballots
 
 		if(DB2) std::cout << std::endl;
 
+		//increment ballot count
     	running_tally[ballots[row][0]].push_back(row);
     	++row;
     	assert(row <= 1000);
@@ -83,7 +75,6 @@ void voting_read (std::istream& r, int& num_cand, int& num_ballots , int ballots
     		break;
     	else
     		r.unget();						// valid input, putting back in istream
-    	
     }
 
 	num_ballots = row;
@@ -93,20 +84,25 @@ void voting_read (std::istream& r, int& num_cand, int& num_ballots , int ballots
 
 int voting_eval (int num_cand, int num_ballots, int ballots[][20], std::vector< std::vector<int> >& running_tally, int tally[21]) 
 {
-	if(DB) std::cout << "entering eval" << std::endl;
 	std::vector<int> losers;
 
 	//counts first-place votes
-	for (int i = 1; i <= num_cand; ++i)
+	for (int i = 1; i <= num_cand; ++i){
+		if (running_tally[i].size() == 0)
+		{
+			tally[i] = -1;
+		}
+		else
 		tally[i] = running_tally[i].size();
+	}
 
-	int min_tally = num_ballots;
-	int max_tally = 0;
+	int min_tally;
+	int max_tally;
 	
     // Loop through until winner is found
 	while(1)
 	{
-		min_tally = max_tally;
+		min_tally = num_ballots;
 		max_tally = 0;		
 		
 		if(DB) std::cout << std::endl;
@@ -180,13 +176,9 @@ int voting_eval (int num_cand, int num_ballots, int ballots[][20], std::vector< 
 						break;
 					}					
 				}
-
 			}
 		}
-
-
     }
-
 }
 
 
@@ -194,19 +186,20 @@ int voting_eval (int num_cand, int num_ballots, int ballots[][20], std::vector< 
 // voting_print
 // -------------
 
-void voting_print (std::ostream& w, int& num_cand, char names[][256] , int* tally, int& winning_tally) 
+void voting_print (std::ostream& w, int& num_cand, char names[][81] , int* tally, int& winning_tally) 
 {
 	bool isFirst = true;
     for (int i = 1; i <= num_cand; ++i)
     {
         if (tally[i] == winning_tally)
         {
+        	//print format for first case
         	if (isFirst)
         	{
         		w << names[i];
         		isFirst = false;
         	}
-        	else
+        	else		//print format for every case after that
         		w << std::endl << names[i];
         }
     }
@@ -223,15 +216,15 @@ void voting_solve (std::istream& r, std::ostream& w)
     int num_cand;
     int num_ballots;
     int ballots[1000][20];
-    char names[21][256];
+    char names[21][81];
     int tally[21];
     std::vector< std::vector<int> > running_tally(21);
 
     bool isFirstCase = true;
-    while ((num_test--) > 0) {
+    while ((num_test--) > 0)
+    {
     	if (!isFirstCase)
     	{
-    		// r.get();
     		//clear vector
     		std::vector< std::vector<int> > new_tally(21);
     		running_tally.swap(new_tally);
@@ -239,6 +232,7 @@ void voting_solve (std::istream& r, std::ostream& w)
 			w << "\n" << std::endl;
     	}
 
+    	//loops through calling main functions
     	voting_read(r, num_cand, num_ballots, ballots, names, running_tally);   
     	int winning_tally = voting_eval(num_cand, num_ballots, ballots, running_tally, tally);
     	voting_print(w, num_cand, names, tally, winning_tally);
@@ -246,5 +240,6 @@ void voting_solve (std::istream& r, std::ostream& w)
     	isFirstCase = false;
     }
 
+    // prints last newline
+    w << std::endl;
 }
-
