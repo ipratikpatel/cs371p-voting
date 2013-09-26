@@ -1,8 +1,10 @@
-// -------------------------------
-// projects/collatz/RunCollatz.c++
+// ----------------------------
+// /cs371p-voting/RunVoting.c++
 // Copyright (C) 2013
-// Glenn P. Downing
-// -------------------------------
+// CS371p Fall 2013
+// Kevin Tran
+// Pratik Patel
+// ----------------------------
 
 /*
 To run the program:

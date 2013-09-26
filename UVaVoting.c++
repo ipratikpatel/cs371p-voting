@@ -80,18 +80,17 @@ void voting_read (std::istream& r, int& num_cand, int& num_ballots , int ballots
 }
 
 
-int voting_eval (int num_cand, int num_ballots, int ballots[][20], std::vector< std::vector<int> >& running_tally, int tally[21]) 
+int voting_eval (int& num_cand, int& num_ballots, int ballots[][20], std::vector< std::vector<int> >& running_tally, int tally[21]) 
 {
 	std::vector<int> losers;
 
 	//counts first-place votes
-	for (int i = 1; i <= num_cand; ++i){
+	for (int i = 1; i <= num_cand; ++i)
+	{
 		if (running_tally[i].size() == 0)
-		{
 			tally[i] = -1;
-		}
 		else
-		tally[i] = running_tally[i].size();
+			tally[i] = running_tally[i].size();
 	}
 
 	int min_tally;
