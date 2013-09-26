@@ -1,0 +1,77 @@
+commit aa4850aaeecc632b8c7ad50897fc7f2eb7ad7ff7
+Author: Kevin Tran <kt6683@cs.utexas.edu>
+Date:   Thu Sep 26 17:36:02 2013 -0500
+
+    Code cleanup, 5 ppl acceptance test, documentation
+
+commit c36758a251d2692dd922a496d43187a75b745ef1
+Author: ipratikpatel <ipratikpatel@gmail.com>
+Date:   Wed Sep 25 23:16:26 2013 -0500
+
+    Passed UVa with smart solution
+
+commit 00dd9abb96e80dad31c7727ce94ac1c4927530cc
+Author: Kevin Tran <kt6683@cs.utexas.edu>
+Date:   Wed Sep 25 17:54:44 2013 -0500
+
+    wrong answer UVa, but no time limit exceeded
+
+commit e4caec8d42326cefe896152b5a63f9dde9f46524
+Author: Kevin Tran <kt6683@cs.utexas.edu>
+Date:   Tue Sep 24 21:06:23 2013 -0500
+
+    whatever
+
+commit 5c8d0e2e059a2ecdc35e6f5a7faa75ac95e0c524
+Author: Kevin Tran <kt6683@cs.utexas.edu>
+Date:   Tue Sep 24 21:03:05 2013 -0500
+
+    UVa not accepting
+
+commit 0d91fb6df7d76ed3c6f42649588803fa3ba4e9b0
+Author: Kevin Tran <kt6683@cs.utexas.edu>
+Date:   Tue Sep 24 19:33:12 2013 -0500
+
+    Good smart solution
+
+commit 499192c9f3c93b2caaad3a6f23238a9d47601cd3
+Author: Kevin Tran <kt6683@cs.utexas.edu>
+Date:   Tue Sep 24 16:42:03 2013 -0500
+
+    added quiz test case and passed
+
+commit 5de1058e3cb5619a99e62a73add7425e43b0ba99
+Author: Kevin Tran <kt6683@cs.utexas.edu>
+Date:   Tue Sep 24 16:39:27 2013 -0500
+
+    some comments
+
+commit 51d158948e834c12795e5208be241dfe978595f6
+Author: Kevin Tran <kt6683@cs.utexas.edu>
+Date:   Tue Sep 24 16:38:18 2013 -0500
+
+    working code for UVa test case
+
+commit 2da91ddb9165b748364cb36d5340781025e97ef9
+Author: ipratikpatel <ipratikpatel@gmail.com>
+Date:   Tue Sep 24 13:17:28 2013 -0500
+
+    Started implementing better solution
+
+commit 2ea5c256f0f77375620869c838d26026c53553cd
+Author: ipratikpatel <ipratikpatel@gmail.com>
+Date:   Mon Sep 23 19:15:13 2013 -0500
+
+    partially dumb solution
+
+commit 6d4c64bd3e1c591e02971ff921d1890f6b35ee1e
+Author: ipratikpatel <ipratikpatel@gmail.com>
+Date:   Mon Sep 23 16:13:09 2013 -0500
+
+    skeleton files
+
+commit e6e571f734fc5b7b1493bdd4231ab9e99526a6db
+Author: ipratikpatel <pratik.patelak47@gmail.com>
+Date:   Mon Sep 23 14:07:02 2013 -0700
+
+    Initial commit
